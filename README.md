@@ -10,9 +10,39 @@ An intelligent fitness application that uses Roboflow's computer vision API to a
 - **Camera Integration**: Works with your device's camera for live analysis
 - **Responsive Design**: Clean, Vercel-inspired UI that works on all devices
 
-## Setup
+## Screenshots
 
-### Environment Variables
+### Main Interface
+
+![Coachly Application Interface](https://i.imgur.com/3VfmIrz.png)
+
+_Coachly's main interface showing real-time camera feed, AI pose analysis, exercise feedback, and analysis history in a clean, modern layout._
+
+### AI Analysis in Action
+
+![AI Analysis Sample](https://i.imgur.com/SkKIJGv.png)
+
+_Sample analysis showing pose detection, real-time feedback, and personalized recommendations for improving squat form._
+## Hackathon Project
+
+Coachly was developed as part of [Ignition Hacks 2025](https://ignition-hacks-v-6.devpost.com/), a student-led hackathon focused on empowering future innovators and supporting tech education. The project showcases how AI and computer vision can make fitness more accessible, personalized, and effective for everyone.
+
+### Future Development Roadmap
+
+To evolve Coachly from a hackathon prototype into a robust fitness platform, the following enhancements are planned:
+
+- **User Accounts & Data Storage**: Secure authentication and database integration for tracking progress and workout history.
+- **Cloud Deployment**: Scalable hosting for reliable access and data persistence.
+- **Progress Analytics**: Visual charts and metrics to help users monitor improvement.
+- **Workout Programs**: Structured plans and personalized recommendations.
+- **Community Features**: Social sharing, friendly competitions, and group challenges.
+- **Mobile & Video Support**: Native apps and session recording for flexible use.
+- **Advanced AI**: Expanded exercise detection, injury prevention, and wearable integration.
+- **Professional Tools**: Dashboards for trainers and premium features for advanced users.
+
+Coachly demonstrates how technology can encourage healthier lifestyles, provide personalized guidance, and foster supportive communities. By leveraging AI for real-time feedback and progress tracking, it helps users build confidence and achieve their fitness goals. The project reflects the spirit of Ignition Hacks—using innovation to create positive impact and prepare students for the future of tech.
+
+## Setup### Environment Variables
 
 1. Copy the example environment file:
 

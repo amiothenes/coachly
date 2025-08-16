@@ -90,45 +90,9 @@ export default function Home() {
           <PostureCamera
             selectedExercise={selectedExercise}
             onAnalysisResult={handleAnalysisResult}
+            analysisHistory={analysisHistory}
           />
         </div>
-
-        {/* Analysis History */}
-        {analysisHistory.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
-            <h3 className="text-xl font-semibold mb-6 text-black">
-              Recent Analysis History
-            </h3>
-            <div className="space-y-4">
-              {analysisHistory.map((result, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-xl border transition-all hover:shadow-sm ${
-                    result.isGoodPosture
-                      ? "bg-green-50 border-green-200"
-                      : "bg-amber-50 border-amber-200"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">
-                      {result.isGoodPosture
-                        ? "✅ Excellent Form"
-                        : "⚠️ Form Needs Work"}
-                    </span>
-                    <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full">
-                      {Math.round(result.confidence * 100)}% confidence
-                    </span>
-                  </div>
-                  {result.feedback.length > 0 && (
-                    <p className="text-sm text-gray-600 mt-2">
-                      {result.feedback[0]}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Footer */}
         <footer className="mt-20 text-center">

@@ -11,11 +11,13 @@ import {
 interface PostureCameraProps {
   selectedExercise: "squat" | "bench" | "deadlift";
   onAnalysisResult?: (result: PostureAnalysisResult) => void;
+  analysisHistory?: PostureAnalysisResult[];
 }
 
 export default function PostureCamera({
   selectedExercise,
   onAnalysisResult,
+  analysisHistory = [],
 }: PostureCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isStreamActive, setIsStreamActive] = useState(false);
@@ -153,80 +155,125 @@ export default function PostureCamera({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Video Feed */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-black">Live Camera</h3>
-          <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover scale-x-[-1]"
-            />
-            {!isStreamActive && (
-              <div className="absolute inset-0 flex items-center justify-center text-white bg-black/20">
-                <p className="text-sm">Camera not active</p>
-              </div>
-            )}
-            {isAnalyzing && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <div className="text-white text-center">
-                  <div className="animate-spin w-6 h-6 border-2 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
-                  <p className="text-sm">Analyzing posture...</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* AI Visualization */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-black">AI Analysis</h3>
-          <div className="relative aspect-video bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
-            {analysisResult?.visualizedImage ? (
-              <img
-                src={`data:image/jpeg;base64,${analysisResult.visualizedImage}`}
-                alt="AI Analysis Visualization"
-                className="w-full h-full object-cover scale-x-[-1]"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg
-                      className="w-6 h-6 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
+        {/* Left Section: Cameras and History */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Cameras Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Video Feed */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-black">Live Camera</h3>
+              <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover scale-x-[-1]"
+                />
+                {!isStreamActive && (
+                  <div className="absolute inset-0 flex items-center justify-center text-white bg-black/20">
+                    <p className="text-sm">Camera not active</p>
                   </div>
-                  <p className="text-sm">AI visualization will appear here</p>
-                  {analysisResult && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      Analysis complete, but no visualization image received
-                    </p>
-                  )}
-                </div>
+                )}
+                {isAnalyzing && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <div className="animate-spin w-6 h-6 border-2 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
+                      <p className="text-sm">Analyzing posture...</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
+            {/* AI Visualization */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-black">AI Analysis</h3>
+              <div className="relative aspect-video bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                {analysisResult?.visualizedImage ? (
+                  <img
+                    src={`data:image/jpeg;base64,${analysisResult.visualizedImage}`}
+                    alt="AI Analysis Visualization"
+                    className="w-full h-full object-cover scale-x-[-1]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg
+                          className="w-6 h-6 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-sm">
+                        AI visualization will appear here
+                      </p>
+                      {analysisResult && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Analysis complete, but no visualization image received
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* Analysis History Below Cameras */}
+          {analysisHistory.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4 text-black">
+                Recent Analysis History
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {analysisHistory.slice(0, 6).map((result, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-xl border transition-all hover:shadow-sm ${
+                      result.isGoodPosture
+                        ? "bg-green-50 border-green-200"
+                        : "bg-amber-50 border-amber-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-gray-900 text-sm">
+                        {result.isGoodPosture
+                          ? "✅ Excellent Form"
+                          : "⚠️ Form Needs Work"}
+                      </span>
+                      <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
+                        {Math.round(result.confidence * 100)}%
+                      </span>
+                    </div>
+                    {result.feedback.length > 0 && (
+                      <p className="text-xs text-gray-600">
+                        {result.feedback[0]}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Analysis Results */}
+        {/* Right Section: Analysis Results */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-black">Analysis Results</h3>
 
