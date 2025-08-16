@@ -6,7 +6,7 @@ import { PostureAnalysisResult } from "@/lib/roboflow";
 
 export default function Home() {
   const [selectedExercise, setSelectedExercise] = useState<
-    "squat" | "bench" | "deadlift"
+    "squat" | "bench" | "deadlift" | "add"
   >("squat");
   const [analysisHistory, setAnalysisHistory] = useState<
     PostureAnalysisResult[]
@@ -28,7 +28,7 @@ export default function Home() {
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-[#6f29a4]">
                 <img
-                  src="/icon.png"
+                  src="/coachly.png"
                   alt="Coachly Icon"
                   className="w-full h-full object-cover"
                 />
@@ -49,8 +49,8 @@ export default function Home() {
           <p className="text-gray-600 mb-8">
             Choose the exercise you want to analyze
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-            {(["squat", "bench", "deadlift"] as const).map((exercise) => (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            {(["squat", "bench", "deadlift", "add"] as const).map((exercise) => (
               <button
                 key={exercise}
                 onClick={() => setSelectedExercise(exercise)}
@@ -60,12 +60,41 @@ export default function Home() {
                     : "bg-white text-gray-900 border-gray-200 hover:border-[#bab5f2]/50"
                 }`}
               >
-                <div className="text-2xl mb-2">
-                  {exercise === "squat" && "🏋️‍♀️"}
-                  {exercise === "bench" && "💪"}
-                  {exercise === "deadlift" && "🏃‍♂️"}
+                <div className="flex justify-center mb-2">
+                  {exercise === "squat" && 
+                  <div className="w-14 h-14 rounded-lg overflow-hidden flex items-center justify-center bg-[#6f29a4]">
+                    <img
+                      src="/squat.png"
+                      alt="Squat Icon"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                      } 
+                      {exercise === "bench" && 
+                      <div className="w-14 h-14 rounded-lg overflow-hidden flex items-center justify-center bg-[#6f29a4]">
+                    <img
+                      src="/bench.png"
+                      alt="Bench Icon"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                      }
+                      {exercise === "deadlift" && 
+                      <div className="w-14 h-14 rounded-lg overflow-hidden flex items-center justify-center bg-[#6f29a4]">
+                    <img
+                      src="/deadlift.png"
+                      alt="Deadlift Icon"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  }
+                  {exercise === "add" && 
+                      <div className="w-14 h-14 rounded-lg overflow-hidden flex items-center justify-center bg-[#6f29a4]">
+                        <div className="text-white text-2xl font-bold">+</div>
+                      </div>
+                  }
                 </div>
-                {exercise.charAt(0).toUpperCase() + exercise.slice(1)}
+                {exercise === "add" ? "Add Exercise" : exercise.charAt(0).toUpperCase() + exercise.slice(1)}
               </button>
             ))}
           </div>
@@ -74,25 +103,27 @@ export default function Home() {
         {/* Current Exercise Info */}
         <div className="mb-12 p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
           <h3 className="text-xl font-semibold mb-4 text-center text-black">
-            {selectedExercise.charAt(0).toUpperCase() +
-              selectedExercise.slice(1)}{" "}
-            Analysis
+            {selectedExercise === "add" 
+              ? "Add New Exercise" 
+              : `${selectedExercise.charAt(0).toUpperCase() + selectedExercise.slice(1)} Analysis`}
           </h3>
           <p className="text-gray-600 text-center leading-relaxed">
-            Position yourself in front of the camera and perform your{" "}
-            {selectedExercise}. Our AI will analyze your form and provide
-            real-time feedback to help you improve.
+            {selectedExercise === "add" 
+              ? "This feature will allow you to add custom exercises in future updates. Stay tuned!"
+              : `Position yourself in front of the camera and perform your ${selectedExercise}. Our AI will analyze your form and provide real-time feedback to help you improve.`}
           </p>
         </div>
 
         {/* Posture Camera Component */}
-        <div className="mb-12">
-          <PostureCamera
-            selectedExercise={selectedExercise}
-            onAnalysisResult={handleAnalysisResult}
-            analysisHistory={analysisHistory}
-          />
-        </div>
+        {selectedExercise !== "add" && (
+          <div className="mb-12">
+            <PostureCamera
+              selectedExercise={selectedExercise as "squat" | "bench" | "deadlift"}
+              onAnalysisResult={handleAnalysisResult}
+              analysisHistory={analysisHistory}
+            />
+          </div>
+        )}
 
         {/* Footer */}
         <footer className="mt-20 text-center">

@@ -1,4 +1,4 @@
-# Coachly - AI-Powered Gym Form Analyzer
+# <img src="public/icon.png" alt="Coachly Icon" width="32" height="32" style="vertical-align: middle;"> Coachly - AI-Powered Gym Form Analyzer
 
 An intelligent fitness application that uses Roboflow's computer vision API to analyze gym exercise form in real-time. Coachly helps users improve their squat, bench press, and deadlift technique through pose detection and personalized feedback.
 
