@@ -42,7 +42,8 @@ To evolve Coachly from a hackathon prototype into a robust fitness platform, the
 
 Coachly demonstrates how technology can encourage healthier lifestyles, provide personalized guidance, and foster supportive communities. By leveraging AI for real-time feedback and progress tracking, it helps users build confidence and achieve their fitness goals. The project reflects the spirit of Ignition Hacks—using innovation to create positive impact and prepare students for the future of tech.
 
-## Setup### Environment Variables
+## Setup
+### Environment Variables
 
 1. Copy the example environment file:
 
