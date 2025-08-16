@@ -14,7 +14,7 @@ An intelligent fitness application that uses Roboflow's computer vision API to a
 
 ### Main Interface
 
-![Coachly Application Interface](https://i.imgur.com/3VfmIrz.png)
+![Coachly Application Interface](https://i.imgur.com/s1YVgls.png)
 
 _Coachly's main interface showing real-time camera feed, AI pose analysis, exercise feedback, and analysis history in a clean, modern layout._
 
