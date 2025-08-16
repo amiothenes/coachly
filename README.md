@@ -19,7 +19,7 @@ An intelligent fitness application that uses Roboflow's computer vision API to a
 _Coachly's main interface showing real-time camera feed, AI pose analysis, exercise feedback, and analysis history in a clean, modern layout._
 
 ### AI Analysis in Action
-
+[Watch the demo video](https://youtu.be/VLzXwiAClsU)
 ![AI Analysis Sample](https://i.imgur.com/jBiBpVZ.png)  
 
 _Sample analysis showing pose detection, real-time feedback, and personalized recommendations for improving squat form._
