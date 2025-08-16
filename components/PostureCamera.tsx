@@ -121,7 +121,11 @@ export default function PostureCamera({
           <>
             <button
               onClick={stopCamera}
-              className="px-6 py-3 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className={`px-6 py-3 text-gray-900 border rounded-lg hover:shadow-lg transition-all font-medium ${
+                analysisResult?.missingKeypoints
+                  ? "bg-red-50 border-red-300 hover:bg-red-100 hover:border-red-400"
+                  : "bg-white border-gray-300 hover:bg-gray-50"
+              }`}
             >
               Stop Camera
             </button>
@@ -162,7 +166,17 @@ export default function PostureCamera({
             {/* Video Feed */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-black">Live Camera</h3>
-              <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden border border-gray-200">
+              <div
+                className={`relative aspect-video bg-gray-900 rounded-xl overflow-hidden border-4 transition-all duration-300 ${
+                  analysisResult?.missingKeypoints
+                    ? "border-red-400 shadow-red-200 shadow-lg"
+                    : analysisResult?.isGoodPosture === false
+                    ? "border-amber-400 shadow-amber-200 shadow-lg"
+                    : analysisResult?.isGoodPosture
+                    ? "border-green-400 shadow-green-200 shadow-lg"
+                    : "border-gray-200"
+                }`}
+              >
                 <video
                   ref={videoRef}
                   autoPlay
@@ -246,14 +260,18 @@ export default function PostureCamera({
                   <div
                     key={index}
                     className={`p-4 rounded-xl border transition-all hover:shadow-sm ${
-                      result.isGoodPosture
+                      result.missingKeypoints
+                        ? "bg-red-50 border-red-200"
+                        : result.isGoodPosture
                         ? "bg-green-50 border-green-200"
                         : "bg-amber-50 border-amber-200"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium text-gray-900 text-sm">
-                        {result.isGoodPosture
+                        {result.missingKeypoints
+                          ? "🔍 Adjust Position"
+                          : result.isGoodPosture
                           ? "✅ Excellent Form"
                           : "⚠️ Form Needs Work"}
                       </span>
@@ -282,7 +300,9 @@ export default function PostureCamera({
               {/* Posture Status */}
               <div
                 className={`p-4 rounded-xl border ${
-                  analysisResult.isGoodPosture
+                  analysisResult.missingKeypoints
+                    ? "bg-red-50 border-red-200"
+                    : analysisResult.isGoodPosture
                     ? "bg-green-50 border-green-200"
                     : "bg-amber-50 border-amber-200"
                 }`}
@@ -290,19 +310,28 @@ export default function PostureCamera({
                 <div className="flex items-center space-x-2">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      analysisResult.isGoodPosture
+                      analysisResult.missingKeypoints
+                        ? "bg-red-500"
+                        : analysisResult.isGoodPosture
                         ? "bg-green-500"
                         : "bg-amber-500"
                     }`}
                   ></div>
                   <span className="font-medium text-gray-900">
-                    {analysisResult.isGoodPosture
+                    {analysisResult.missingKeypoints
+                      ? "🔍 Adjust Position"
+                      : analysisResult.isGoodPosture
                       ? "✅ Excellent Form"
                       : "⚠️ Form Needs Attention"}
                   </span>
                 </div>
                 <p className="text-sm mt-2 text-gray-600">
                   Confidence: {Math.round(analysisResult.confidence * 100)}%
+                  {analysisResult.missingKeypoints && (
+                    <span className="block text-red-600 font-medium mt-1">
+                      Some key body parts are not visible
+                    </span>
+                  )}
                 </p>
               </div>
 
@@ -324,7 +353,13 @@ export default function PostureCamera({
 
               {/* Detected Issues */}
               {analysisResult.detectedIssues.length > 0 && (
-                <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                <div
+                  className={`p-4 rounded-xl border ${
+                    analysisResult.missingKeypoints
+                      ? "bg-red-50 border-red-200"
+                      : "bg-orange-50 border-orange-200"
+                  }`}
+                >
                   <h4 className="font-medium mb-2 text-gray-900">
                     Areas for Improvement
                   </h4>

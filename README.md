@@ -20,7 +20,7 @@ _Coachly's main interface showing real-time camera feed, AI pose analysis, exerc
 
 ### AI Analysis in Action
 
-![AI Analysis Sample](https://i.imgur.com/SkKIJGv.png)
+![AI Analysis Sample](https://i.imgur.com/jBiBpVZ.png)  
 
 _Sample analysis showing pose detection, real-time feedback, and personalized recommendations for improving squat form._
 ## Hackathon Project

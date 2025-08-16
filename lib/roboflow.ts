@@ -3,6 +3,9 @@
  * Analyzes gym exercise posture (squat, bench, deadlift)
  */
 
+import { analyzeTechnique, getExerciseSpecificFeedback } from './techniqueAnalysis';
+export { getExerciseTips } from './techniqueAnalysis';
+
 const ROBOFLOW_API_URL = process.env.NEXT_PUBLIC_ROBOFLOW_API_URL;
 const API_KEY = process.env.NEXT_PUBLIC_ROBOFLOW_API_KEY;
 
@@ -55,6 +58,7 @@ export interface PostureAnalysisResult {
   exercise: 'squat' | 'bench' | 'deadlift' | 'unknown';
   detectedIssues: string[];
   visualizedImage?: string; // Base64 encoded image with annotations
+  missingKeypoints?: boolean; // Flag for when critical keypoints are not visible
 }
 
 /**
@@ -150,7 +154,8 @@ function processRoboflowResponse(response: RoboflowResponse, exerciseType?: 'squ
     confidence: 0,
     feedback: [],
     exercise: exerciseType || 'unknown',
-    detectedIssues: []
+    detectedIssues: [],
+    missingKeypoints: false
   };
 
   try {
@@ -172,10 +177,13 @@ function processRoboflowResponse(response: RoboflowResponse, exerciseType?: 'squ
     
     // Analyze keypoints for posture quality
     const keypoints = personDetection?.keypoints || [];
-    const postureAnalysis = analyzeKeypoints(keypoints, exerciseType);
+    const postureAnalysis = analyzeTechnique(keypoints, exerciseType);
+    
+    // Check for missing critical keypoints
+    const missingKeypoints = checkForMissingKeypoints(keypoints, exerciseType);
     
     // Determine if posture is good based on confidence and keypoint analysis
-    const isGoodPosture = confidence > 0.7 && postureAnalysis.score > 0.6;
+    const isGoodPosture = confidence > 0.7 && postureAnalysis.score > 0.6 && !missingKeypoints;
     
     // Generate feedback based on analysis
     const feedback: string[] = [];
@@ -206,6 +214,11 @@ function processRoboflowResponse(response: RoboflowResponse, exerciseType?: 'squ
         detectedIssues.push("Person detection confidence is low");
         feedback.push("Make sure you're clearly visible in the camera frame.");
       }
+
+      if (missingKeypoints) {
+        detectedIssues.push("Some critical body parts are not visible");
+        feedback.push("Adjust your position to ensure all key body parts are visible in the camera.");
+      }
     }
 
     return {
@@ -214,7 +227,8 @@ function processRoboflowResponse(response: RoboflowResponse, exerciseType?: 'squ
       feedback,
       exercise: exerciseType || 'unknown',
       detectedIssues,
-      visualizedImage
+      visualizedImage,
+      missingKeypoints
     };
   } catch (error) {
     console.error('Error processing Roboflow response:', error);
@@ -223,159 +237,21 @@ function processRoboflowResponse(response: RoboflowResponse, exerciseType?: 'squ
 }
 
 /**
- * Analyze keypoints to assess posture quality
+ * Check for missing critical keypoints based on exercise type
  */
-function analyzeKeypoints(keypoints: Array<{class: string, confidence: number, x: number, y: number}>, exerciseType?: 'squat' | 'bench' | 'deadlift') {
-  const issues: string[] = [];
-  let score = 1.0;
-
-  // Find key body parts
-  const nose = keypoints.find(kp => kp.class === 'nose');
-  const leftShoulder = keypoints.find(kp => kp.class === 'left_shoulder');
-  const rightShoulder = keypoints.find(kp => kp.class === 'right_shoulder');
-  const leftHip = keypoints.find(kp => kp.class === 'left_hip');
-  const rightHip = keypoints.find(kp => kp.class === 'right_hip');
-  const leftKnee = keypoints.find(kp => kp.class === 'left_knee');
-  const rightKnee = keypoints.find(kp => kp.class === 'right_knee');
-  const leftAnkle = keypoints.find(kp => kp.class === 'left_ankle');
-  const rightAnkle = keypoints.find(kp => kp.class === 'right_ankle');
-
-  // Check for low confidence keypoints
-  const lowConfidenceThreshold = 0.5;
-  const lowConfidenceKeypoints = keypoints.filter(kp => kp.confidence < lowConfidenceThreshold);
-  
-  if (lowConfidenceKeypoints.length > 3) {
-    issues.push("Some body parts are not clearly visible");
-    score -= 0.2;
-  }
-
-  // General posture checks
-  // Check shoulder alignment
-  if (leftShoulder && rightShoulder && leftShoulder.confidence > 0.5 && rightShoulder.confidence > 0.5) {
-    const shoulderDiff = Math.abs(leftShoulder.y - rightShoulder.y);
-    if (shoulderDiff > 30) {
-      issues.push("Shoulders appear uneven - focus on symmetrical positioning");
-      score -= 0.2;
-    }
-  }
-
-  // Check hip alignment
-  if (leftHip && rightHip && leftHip.confidence > 0.5 && rightHip.confidence > 0.5) {
-    const hipDiff = Math.abs(leftHip.y - rightHip.y);
-    if (hipDiff > 25) {
-      issues.push("Hip alignment could be improved");
-      score -= 0.2;
-    }
-  }
-
-  // Exercise-specific checks
-  if (exerciseType === 'squat') {
-    // Squat-specific analysis
-    if (leftKnee && rightKnee && leftKnee.confidence > 0.5 && rightKnee.confidence > 0.5) {
-      const kneeDiff = Math.abs(leftKnee.x - rightKnee.x);
-      if (kneeDiff < 20) {
-        issues.push("Knees may be too close together for a proper squat stance");
-        score -= 0.15;
-      }
-    }
-    
-    // Check knee-ankle alignment for squats
-    if (leftKnee && leftAnkle && leftKnee.confidence > 0.5 && leftAnkle.confidence > 0.5) {
-      const kneeAnkleAlignment = Math.abs(leftKnee.x - leftAnkle.x);
-      if (kneeAnkleAlignment > 50) {
-        issues.push("Left knee tracking could be improved");
-        score -= 0.1;
-      }
-    }
-  } else if (exerciseType === 'deadlift') {
-    // Deadlift-specific analysis
-    if (nose && leftHip && rightHip) {
-      const avgHipY = (leftHip.y + rightHip.y) / 2;
-      const spineAngle = Math.abs(nose.y - avgHipY);
-      // Check for proper spine positioning (simplified)
-      if (spineAngle < 100) {
-        issues.push("Maintain a more upright spine position");
-        score -= 0.2;
-      }
-    }
-  } else if (exerciseType === 'bench') {
-    // Bench press specific analysis would require different keypoint analysis
-    // This is more complex as it typically requires side view
-    if (leftShoulder && rightShoulder) {
-      // Basic shoulder stability check
-      const shoulderWidth = Math.abs(leftShoulder.x - rightShoulder.x);
-      if (shoulderWidth < 50) {
-        issues.push("Shoulder positioning could be more stable");
-        score -= 0.1;
-      }
-    }
-  }
-
-  return { score: Math.max(0, score), issues };
-}
-
-/**
- * Get exercise-specific feedback based on posture analysis
- */
-function getExerciseSpecificFeedback(exerciseType: 'squat' | 'bench' | 'deadlift', postureAnalysis: {score: number, issues: string[]}) {
-  const feedback: string[] = [];
-  
-  switch (exerciseType) {
-    case 'squat':
-      if (postureAnalysis.score < 0.7) {
-        feedback.push("Focus on keeping your weight balanced on your heels");
-        feedback.push("Ensure your knees track in line with your toes");
-      }
-      break;
-    case 'deadlift':
-      if (postureAnalysis.score < 0.7) {
-        feedback.push("Keep the bar close to your body throughout the movement");
-        feedback.push("Maintain a neutral spine position");
-      }
-      break;
-    case 'bench':
-      if (postureAnalysis.score < 0.7) {
-        feedback.push("Keep your shoulder blades pulled back and down");
-        feedback.push("Maintain stability throughout the movement");
-      }
-      break;
-  }
-  
-  return feedback;
-}
-
-/**
- * Get exercise-specific feedback and tips
- */
-export function getExerciseTips(exercise: string): string[] {
-  const tips: Record<string, string[]> = {
-    squat: [
-      "Keep your chest up and shoulders back",
-      "Ensure knees track over your toes",
-      "Maintain a neutral spine throughout the movement",
-      "Descend until thighs are parallel to the floor",
-      "Drive through your heels when standing up"
-    ],
-    bench: [
-      "Keep your feet firmly planted on the ground",
-      "Maintain a slight arch in your lower back",
-      "Keep your shoulder blades pulled together",
-      "Lower the bar to your chest with control",
-      "Press the bar in a straight line above your chest"
-    ],
-    deadlift: [
-      "Keep the bar close to your body throughout",
-      "Maintain a neutral spine - no rounding",
-      "Engage your lats to keep the bar close",
-      "Drive through your heels and squeeze your glutes",
-      "Keep your shoulders back and chest up"
-    ]
+function checkForMissingKeypoints(keypoints: any[], exerciseType?: 'squat' | 'bench' | 'deadlift'): boolean {
+  const requiredKeypoints = {
+    squat: ['left_shoulder', 'right_shoulder', 'left_hip', 'right_hip', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle'],
+    bench: ['left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist'],
+    deadlift: ['left_shoulder', 'right_shoulder', 'left_hip', 'right_hip', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
   };
-  
-  return tips[exercise.toLowerCase()] || [
-    "Focus on proper form over heavy weight",
-    "Move with control throughout the entire range of motion",
-    "Breathe properly - exhale on exertion",
-    "Warm up thoroughly before starting"
-  ];
+
+  const required = exerciseType ? requiredKeypoints[exerciseType] : ['left_shoulder', 'right_shoulder', 'left_hip', 'right_hip'];
+  const confidenceThreshold = 0.3;
+
+  const visibleKeypoints = keypoints.filter(kp => kp.confidence > confidenceThreshold).map(kp => kp.class);
+  const missingCount = required.filter(req => !visibleKeypoints.includes(req)).length;
+
+  // Consider keypoints missing if more than 30% of required keypoints are not visible
+  return missingCount > required.length * 0.3;
 }
