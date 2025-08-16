@@ -1,0 +1,21 @@
+{
+  "name": "Coachly",
+  "short_name": "Coachly",
+  "description": "AI-Powered Gym Form Analysis",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E3F4FE",
+  "theme_color": "#6f29a4",
+  "icons": [
+    {
+      "src": "/coachly.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/coachly.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
