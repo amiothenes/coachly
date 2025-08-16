@@ -1,4 +1,4 @@
-# <img src="public/icon.png" alt="Coachly Icon" width="32" height="32" style="vertical-align: middle;"> Coachly - AI-Powered Gym Form Analyzer
+# <img src="https://i.imgur.com/C2PZRhJ.png" alt="Coachly Icon" width="32" height="32" style="vertical-align: middle;"> Coachly - AI-Powered Gym Form Analyzer
 
 An intelligent fitness application that uses Roboflow's computer vision API to analyze gym exercise form in real-time. Coachly helps users improve their squat, bench press, and deadlift technique through pose detection and personalized feedback.
 
@@ -19,7 +19,7 @@ An intelligent fitness application that uses Roboflow's computer vision API to a
 _Coachly's main interface showing real-time camera feed, AI pose analysis, exercise feedback, and analysis history in a clean, modern layout._
 
 ### AI Analysis in Action
-
+[Watch the demo video](https://youtu.be/VLzXwiAClsU)
 ![AI Analysis Sample](https://i.imgur.com/jBiBpVZ.png)  
 
 _Sample analysis showing pose detection, real-time feedback, and personalized recommendations for improving squat form._
@@ -40,7 +40,7 @@ To evolve Coachly from a hackathon prototype into a robust fitness platform, the
 - **Advanced AI**: Expanded exercise detection, injury prevention, and wearable integration.
 - **Professional Tools**: Dashboards for trainers and premium features for advanced users.
 
-Coachly demonstrates how technology can encourage healthier lifestyles, provide personalized guidance, and foster supportive communities. By leveraging AI for real-time feedback and progress tracking, it helps users build confidence and achieve their fitness goals. The project reflects the spirit of Ignition Hacks—using innovation to create positive impact and prepare students for the future of tech.
+Coachly demonstrates how technology can encourage healthier lifestyles, provide personalized guidance, and foster supportive communities. By leveraging AI for real-time feedback and progress tracking, it helps users build confidence and achieve their fitness goals. The project reflects the spirit of Ignition Hacks, using innovation to create positive impact and prepare students for the future of tech.
 
 ## Setup
 ### Environment Variables
